@@ -1,10 +1,17 @@
-Twittybrite displays direct messages sent to a twitter account 
+= TwittyBrite
+Displays direct messages sent to a twitter account 
 on a betabrite led display via usb.
 
+= Copyright
 Author::  Philippe Creux for O2Sources (pcreux AATT o2sources DOOT com)
 Copyright:: Copyright (c) 2009. O2Sources. All rights reserved.
 
+TwittyBrite is only compatible with the BetaBrite LED screens.
+http://www.betabrite.com/
+
+= Installation
 * Please run this script as root (or using sudo)
 * Please update the "config/bot.yml" with your details
 * The following packages are required: ruby, rubygems, libusb-dev
 * The following gems are required: twibot, betabrite, ruby-usb
+
