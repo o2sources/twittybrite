@@ -16,6 +16,9 @@ require 'twibot'
 require 'betabrite'
 require 'iconv'
 
+# Text displayed by default
+DEFAULT_TEXT = ""
+
 # Display text on the betabright!
 # * available colors are: red, green, amber, dim_red, dim_green, brown, orange, yellow
 # * available modes are: flash, hold, rotate, scroll
@@ -40,19 +43,20 @@ def display (sender, message)
   betabrite "NEW MESSAGE!", "orange", "flash"
   sleep 3
   3.times do
-    betabrite "from", "green", "hold"
+    betabrite "from", "green"
     sleep 1
     betabrite sender, "green", "hold"
     sleep 3
     betabrite message + " " * 20
     sleep message.size / 10 + 4
   end
+  betabrite DEFAULT_TEXT
 end
 
 class String
   # Return the ASCII string.
   def ascii
-    Iconv.conv('US-ASCII//TRANSLIT','UTF-8', self)
+    return Iconv.conv('US-ASCII//TRANSLIT','UTF-8', self)
   end
 end
 
@@ -64,3 +68,5 @@ message do |message, params|
     puts $!
   end
 end
+
+betabrite DEFAULT_TEXT
