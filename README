@@ -1,2 +1,10 @@
-Put your twitter login and password in the yaml file in the config directory.
-Plug your Beta Brite led screen to your computer and send yourself a direct message. It'll show up on the screen.
+Twittybrite displays direct messages sent to a twitter account 
+on a betabrite led display via usb.
+
+Author::  Philippe Creux for O2Sources (pcreux AATT o2sources DOOT com)
+Copyright:: Copyright (c) 2009. O2Sources. All rights reserved.
+
+* Please run this script as root (or using sudo)
+* Please update the "config/bot.yml" with your details
+* The following packages are required: ruby, rubygems, libusb-dev
+* The following gems are required: twibot, betabrite, ruby-usb
