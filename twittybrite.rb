@@ -12,12 +12,9 @@
 
 require 'rubygems'
 require 'usb'
-require 'twibot'
 require 'betabrite'
+require 'twibot'
 require 'iconv'
-
-# Text displayed by default
-DEFAULT_TEXT = ""
 
 # Display text on the betabright!
 # * available colors are: red, green, amber, dim_red, dim_green, brown, orange, yellow
@@ -34,7 +31,6 @@ def betabrite (text, color = 'amber', anim = 'rotate')
       print string(text.ascii).send(color).seven_stroke
     end
   end
-
   bb.write!
 end
 
@@ -42,31 +38,67 @@ end
 def display (sender, message)
   betabrite "NEW MESSAGE!", "orange", "flash"
   sleep 3
-  3.times do
-    betabrite "from", "green"
-    sleep 1
+  2.times do
+    betabrite "from" + " " * 5, "green"
+    sleep 2
     betabrite sender, "green", "hold"
     sleep 3
     betabrite message + " " * 20
-    sleep message.size / 10 + 4
+    sleep message.ascii.size / 10 + 4 # That's a hack. :)
   end
-  betabrite DEFAULT_TEXT
+  betabrite ""
+  sleep 2
 end
 
 class String
   # Return the ASCII string.
+  # Looks like Ivonv does not work correctly. We use hard-coded conversions then.
   def ascii
-    return Iconv.conv('US-ASCII//TRANSLIT','UTF-8', self)
+    from = 'àâäéèêëîïôöùûüçÀÂÄÉÈÊËÎÏÔÛÇ'
+    to =   'aaeeeeeiioouuucAAAEEEEIIOUC'
+    return Iconv.conv('US-ASCII//TRANSLIT','UTF-8', self.tr(from, to).gsub('&lt;', '<').gsub('&gt;', '>'))
   end
+end
+
+# Seconds to h:m
+def time_to(h, m = 0)
+  begin
+    time_now = Time.now
+    return (Time.local(time_now.year, time_now.month, time_now.day, h, m) - time_now).to_i
+  rescue
+    sleep 1
+    retry
+  end
+end
+
+# Create a new thread displaying time (HH:MM) on the betabrite every minute
+def display_time_thread
+  Thread.new {
+    while true
+      @@betamutex.synchronize {
+        betabrite(Time.now.strftime('%H:%M'), "dim_green", "hold")
+      }
+      sleep 1
+      st = 61 + time_to(Time.now.hour, Time.now.min)
+      sleep st
+    end
+  }
 end
 
 # Get direct messages thanks to twibot and display them
 message do |message, params|
+  puts message.sender.screen_name
+  puts message.to_s
   begin
-    display message.sender.screen_name, message.to_s
+    @@betamutex.synchronize {
+      display message.sender.screen_name, message.to_s
+    }
   rescue
     puts $!
   end
 end
 
-betabrite DEFAULT_TEXT
+Thread.abort_on_exception = true
+@@betamutex = Mutex.new
+sleep 10 # let twibot starting up
+display_time_thread
